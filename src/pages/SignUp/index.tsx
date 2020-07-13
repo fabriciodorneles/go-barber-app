@@ -13,6 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
 import * as Yup from 'yup';
+import api from '../../services/api';
 import getValidationErrors from '../../utils/getValidationErrors';
 
 import Input from '../../components/Input';
@@ -48,9 +49,11 @@ const SignUp: React.FC = () => {
                 abortEarly: false,
             });
 
-            // await api.post('users', data);
+            console.log(data);
+            console.log('aqui');
+            await api.post('users', data);
             // // direciona pra root(login)
-            // history.push('/');
+            navigation.navigate('SignIn');
 
             Alert.alert(
                 'Cadastro Realizado!',
@@ -66,6 +69,7 @@ const SignUp: React.FC = () => {
                 'Erro no cadastro',
                 'Ocorreu um erro no cadastro, tente novamente.',
             );
+            console.log(err);
         }
     }, []);
 
