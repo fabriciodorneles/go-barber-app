@@ -29,7 +29,7 @@
         "prettier"
     ],
     "rules": {
-        "@typescript-eslint/ban-types":"warn",
+        "@typescript-eslint/ban-types":"off",
         "no-unused-expressions":"off",
         "no-unused-vars":"warn",
 
