@@ -1,23 +1,16 @@
-import React from 'react';
-import {
-    Image,
-    View,
-    KeyboardAvoidingView,
-    ScrollView,
-    Platform,
-} from 'react-native';
-
-import Icon from 'react-native-vector-icons/Feather';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import api from '../../services/api';
 import { useAuth } from '../../hooks/auth';
-
-import logoImg from '../../assets/logo.png';
 
 import {
     Container,
-    Title,
-    CreateAccountButton,
-    CreateAccountButtonText,
+    Header,
+    HeaderTitle,
+    UserName,
+    ProfileButton,
+    UserAvatar,
+    ProvidersList,
 } from './styles';
 
 interface SignInFormData {
@@ -25,36 +18,45 @@ interface SignInFormData {
     password: string;
 }
 
+export interface Provider {
+    id: string;
+    name: string;
+    avatar: string;
+}
+
 const Dashboard: React.FC = () => {
-    const navigation = useNavigation();
-    const { signOut } = useAuth();
+    const [providers, setProviders] = useState<Provider[]>([]);
+    const { navigate } = useNavigation();
+    const { signOut, user } = useAuth();
+
+    const navigateToProfile = useCallback(() => {
+        // navigate('Profile');
+        signOut();
+    }, []);
+
+    useEffect(() => {
+        api.get('providers').then(response => {
+            setProviders(response.data);
+        });
+    }, []);
     return (
-        <>
-            <KeyboardAvoidingView
-                style={{ flex: 1 }}
-                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                enabled
-            >
-                <ScrollView
-                    keyboardShouldPersistTaps="handled"
-                    contentContainerStyle={{ flex: 1 }}
-                >
-                    <Container>
-                        <Image source={logoImg} />
-                        <View>
-                            <Title>Dashboard</Title>
-                        </View>
-                        <View>
-                            <Title>Você está logado.</Title>
-                        </View>
-                    </Container>
-                </ScrollView>
-            </KeyboardAvoidingView>
-            <CreateAccountButton onPress={signOut}>
-                <Icon name="arrow-left" size={20} color="#ff9000" />
-                <CreateAccountButtonText>Logout</CreateAccountButtonText>
-            </CreateAccountButton>
-        </>
+        <Container>
+            <Header>
+                <HeaderTitle>
+                    Bem Vindo, {'\n'}
+                    <UserName>{user.name}</UserName>
+                </HeaderTitle>
+
+                <ProfileButton onPress={navigateToProfile}>
+                    <UserAvatar source={{ uri: user.avatar_url }} />
+                </ProfileButton>
+            </Header>
+            <ProvidersList
+                data={providers}
+                keyExtractor={provider => provider.id}
+                renderItem={({ item }) => <UserName>{item.name}</UserName>}
+            />
+        </Container>
     );
 };
 
